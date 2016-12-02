@@ -1,7 +1,7 @@
 module Fluent
   class KempFilter < Filter
 
-    Fluent::Plugin.register_filter('filter_kemp', self)
+    Fluent::Plugin.register_filter('filter_qnd_kemp_rest', self)
 
     def initialize
       super
@@ -30,6 +30,30 @@ module Fluent
       # Use Time.now, because it is the only way to get subsecond precision in version 0.12.
       # The time may be slightly in the future from the ingestion time.
 
+      #the filter implements splitting logic for different data returned by the in_qnd_kemp_rest filter        
+      #record={
+      #    "DataType"=>"KEMP_DEVICE_INFO",
+      #    "IPName"=>"LogManagement",
+      #    "DataItems" => records
+      #  }
+
+      case record["DataType"] 
+      when "KEMP_DEVICE_INFO"
+        record["Timestamp"] = OMS::Common.format_time(Time.now.to_f)
+        record["EventTime"] = OMS::Common.format_time(time)
+        record["Computer"] = record["hostname"]
+        record["HostIP"] = "Unknown IP"
+        tag += '.info'
+        host_ip = @ip_cache.get_ip(hostname)
+        if host_ip.nil?
+            OMS::Log.warn_once("Failed to get the IP for #{hostname}.")
+        else
+          record["HostIP"] = host_ip
+        end
+        
+      else
+          $log.warning {"DataType #{record['DataType']} not yet implemented, data is discarded"}
+      end
       record["Timestamp"] = OMS::Common.format_time(Time.now.to_f)
       record["EventTime"] = OMS::Common.format_time(time)
       hostname = record["host"]
@@ -57,10 +81,6 @@ module Fluent
       else
         $log.error "The syslog tag does not have 4 parts #{tag}"
       end
-
-      #filter out syslog deuplicate message events
-      if (record["Facility"] =='user' && record["Severity"]=='err' && record["Ident"]=='message' && record["Host"]=='last') then return nil end
-
 
       regexp_stats=Regexp.new("(?<type>.*)status:\\D+(?<total>\\d+)\\D+(?<up>\\d+)\\D+(?<down>\\d+)\\D+(?<disabled>\\d+)")
       result=regexp_stats.match(record["message"])
