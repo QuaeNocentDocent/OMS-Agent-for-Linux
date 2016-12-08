@@ -75,9 +75,7 @@ module Fluent
         #record["Disabled"] = Integer(result["disabled"]) rescue nil                
         #record["Message"] = record["message"] #to be removed
         #end of comment, ruby is really ugly with comments!!
-        #for sure there's a better and more elegant way to do this in ruby, too bad I don't know it
         data_items = []
-
         data_info = {}
         data_info["Timestamp"] = record["Timestamp"]
         data_info["Host"] = record["Host"]
@@ -85,22 +83,12 @@ module Fluent
         data_info["ObjectName"] = "KempLM-#{object_name}"
         data_info["InstanceName"] = "_Total"
         counters=[]
-        counter_pair = {}       
-        counter_pair["CounterName"]="Total"
-        counter_pair["Value"]=Integer(result["total"]) rescue nil
-        counters.push(counter_pair)
-        counter_pair = {}       
-        counter_pair["CounterName"]="Up"
-        counter_pair["Value"]=Integer(result["up"]) rescue nil
-        counters.push(counter_pair)
-        counter_pair = {}       
-        counter_pair["CounterName"]="Down"
-        counter_pair["Value"]=Integer(result["down"]) rescue nil
-        counters.push(counter_pair)
-        counter_pair = {}       
-        counter_pair["CounterName"]="Disabled"
-        counter_pair["Value"]=Integer(result["disabled"]) rescue nil
-        counters.push(counter_pair)
+        result.names.each {|name|
+          counter_pair = {}       
+          counter_pair["CounterName"]="Total"
+          counter_pair["Value"]=Integer(result[name]) rescue nil
+          counters.push(counter_pair)      
+        }
 
         data_info["Collections"] = counters
         data_items.push(data_info)
