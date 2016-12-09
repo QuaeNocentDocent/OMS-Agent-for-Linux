@@ -18,5 +18,4 @@ wget "$GITHUB_SOURCE/installer/conf/omsagent.d/kemp.conf"
 cp ./*.rb $PLUGIN_PATH
 cp ./kemp.conf $CONF_PATH
 
-
-
+`/opt/microsoft/omsagent/bin/gem install multi_xml
