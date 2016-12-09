@@ -75,7 +75,7 @@ The solution will create the following data types:
 
 This solution is open source under the GPL-2.0 licensing agreement. Is it is basically free, anyway support for deploying and/or configuring it is not free, you can contact my company by [email](mailto:info@progel.it)
 
-If you find this solution useful and want to contribute to local community events, socials and charities you can donate
+If you find this solution useful and want to contribute to local community events, socials and charities you can ...
 
 <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
 <input type="hidden" name="cmd" value="_s-xclick">
